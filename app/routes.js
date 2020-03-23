@@ -14,6 +14,7 @@ module.exports = function(app, passport, db) {
           res.render('profile.ejs', {
             user : req.user,
             messages: result
+
           })
         })
     });
@@ -33,7 +34,7 @@ module.exports = function(app, passport, db) {
         res.redirect('/profile')
       })
     })
-
+    // thumbs UP!
     app.put('/messages', (req, res) => {
       db.collection('messages')
       .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
@@ -48,6 +49,21 @@ module.exports = function(app, passport, db) {
         res.send(result)
       })
     })
+
+    app.put('/messagesDown', (req, res) => {
+      db.collection('messages')
+        .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
+          $set: {
+            thumbUp:req.body.thumbUp - 1
+          }
+        }, {
+          sort: {_id: -1},
+          upsert: true
+        }, (err, result) => {
+          if (err) return res.send(err)
+          res.send(result)
+        })
+      })
 
     app.delete('/messages', (req, res) => {
       db.collection('messages').findOneAndDelete({name: req.body.name, msg: req.body.msg}, (err, result) => {
